@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediSync Dashboard - HackXplore 2K26</title>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#0d9488">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <nav id="navbar" class="scrolled">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-heart-pulse"></i> MediSync
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <div id="google_translate_element"></div>
+                <a href="/logout" class="btn-secondary" style="padding: 0.5rem 1.2rem;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container dashboard-container">
+        <div class="dash-header fade-in-up">
+            <div>
+                <h2>Rural Healthcare Dashboard</h2>
+                <p>Welcome, Doctor / Health Worker. Manage patient records and run AI assessments.</p>
+            </div>
+            <div class="badge">MVP Demonstration v1.0</div>
+        </div>
+
+        <div class="dash-grid">
+            <!-- Add New Patient -->
+            <div class="glass-card panel fade-in-up">
+                <h3><i class="fa-solid fa-user-plus"></i> Register New Patient</h3>
+                <p style="margin-bottom:1rem; font-size:0.9rem;">Add a new patient to the MediSync network.</p>
+                <div class="form-group">
+                    <input type="text" id="np-name" class="form-control" placeholder="Full Name">
+                </div>
+                <div style="display:flex; gap:1rem;">
+                    <div class="form-group" style="flex:1;">
+                        <input type="number" id="np-age" class="form-control" placeholder="Age">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <input type="text" id="np-village" class="form-control" placeholder="Village">
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="addPatient()" style="width:100%; border-radius:8px;">Register Patient</button>
+            </div>
+
+            <!-- Patient Directory -->
+            <div class="glass-card panel fade-in-up">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0;"><i class="fa-solid fa-users"></i> Patient Directory</h3>
+                    <button class="btn-primary" onclick="loadPatients()" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;"><i class="fa-solid fa-sync"></i> Refresh</button>
+                </div>
+                <p style="margin-bottom:1rem; font-size:0.9rem;">Overview of all registered patients.</p>
+                <div class="patient-table-wrapper">
+                    <table class="patient-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Village</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientTableBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Unified PR -->
+            <div class="glass-card panel fade-in-up">
+                <h3><i class="fa-solid fa-id-card-clip"></i> Unified Health Record</h3>
+                <p style="margin-bottom:1rem; font-size:0.9rem;">Fetch ABDM-aligned records (Try Patient ID: 1001)</p>
+                <div class="search-box">
+                    <input type="text" id="patientId" class="form-control" placeholder="Enter Patient ID (e.g., 1001)">
+                    <button class="btn-primary" onclick="fetchRecord()" style="padding: 0.8rem 1.5rem; border-radius:8px;">Fetch</button>
+                </div>
+                
+                <div id="recordSpinner" class="loading-spinner">
+                    <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i>
+                </div>
+
+                <div id="healthRecord" class="health-record">
+                    <div style="background:rgba(12,163,143,0.1); padding: 1rem; border-radius:8px; margin-bottom:1rem;">
+                        <h4 style="margin:0; color:var(--primary);" id="r-name">Name</h4>
+                        <span style="font-size:0.85rem; color:#aaa;">Verified via Aadhar</span>
+                    </div>
+                    <div class="record-item"><span>Age/Village:</span> <b id="r-age"></b></div>
+                    <div class="record-item"><span>Last BP:</span> <b id="r-bp"></b></div>
+                    <div class="record-item"><span>Last Fasting Sugar:</span> <b id="r-sugar"></b> mg/dL</div>
+                    <div class="record-item"><span>Medical History:</span> <b id="r-history"></b></div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+                        <button class="btn-edit" onclick="editCurrentPatient()"><i class="fa-solid fa-edit"></i> Edit</button>
+                        <button class="btn-danger" onclick="deleteCurrentPatient()"><i class="fa-solid fa-trash"></i> Delete</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Editing Modal -->
+            <div id="editModal" class="modal-overlay">
+                <div class="modal fade-in-up" style="max-width: 500px; padding: 2rem;">
+                    <h3><i class="fa-solid fa-user-edit"></i> Edit Patient Details</h3>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="edit-name" class="form-control">
+                    </div>
+                    <div style="display:flex; gap:1rem;">
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Age</label>
+                            <input type="number" id="edit-age" class="form-control">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Village</label>
+                            <input type="text" id="edit-village" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Medical History</label>
+                        <input type="text" id="edit-history" class="form-control">
+                    </div>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+                        <button class="btn-secondary" onclick="document.getElementById('editModal').style.display='none'" style="padding: 0.5rem 1rem;">Cancel</button>
+                        <button class="btn-primary" onclick="savePatientEdit()">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Telemedicine Connect -->
+            <div class="glass-card panel fade-in-up" style="animation-delay: 0.1s;">
+                <h3><i class="fa-solid fa-video"></i> Telemedicine Connect</h3>
+                <p style="margin-bottom:1rem; font-size:0.9rem;">Initiate low-bandwidth consultation</p>
+                
+                <div class="tele-box">
+                    <div class="tele-icon"><i class="fa-solid fa-headset"></i></div>
+                    <h4 style="margin-bottom:0.5rem;">Nearest Specialist Available</h4>
+                    <p style="margin-bottom:1.5rem;">Dr. Sharma (Cardiology) - District Hospital</p>
+                    <button class="btn-primary" onclick="startVideoCall()">Start Video Consult</button>
+                </div>
+            </div>
+
+            <!-- Population Health Analytics -->
+            <div class="glass-card panel fade-in-up" style="animation-delay: 0.15s;">
+                <h3><i class="fa-solid fa-chart-pie"></i> Village Risk Distribution</h3>
+                <p style="margin-bottom:1rem; font-size:0.9rem;">Real-time analysis of screened demographic</p>
+                <div style="position: relative; height: 260px; display: flex; justify-content: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem;">
+                    <canvas id="analyticsChart"></canvas>
+                </div>
+                <div style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: #64748b;">
+                    Total historical screenings: <b id="totalScreenings" style="color: #0d9488;">---</b>
+                </div>
+            </div>
+
+            <!-- Translate Styling Fixes -->
+            <style>
+                .goog-te-combo {
+                    padding: 0.5rem;
+                    border-radius: 8px;
+                    border: 1px solid #cbd5e1;
+                    color: #000000 !important;
+                    font-family: 'Outfit', sans-serif;
+                    background-color: #ffffff;
+                    outline: none;
+                }
+            </style>
+
+            <!-- AI Risk Predictor -->
+            <div class="glass-card panel fade-in-up" style="grid-column: 1 / -1; animation-delay: 0.2s;">
+                <h3><i class="fa-solid fa-brain"></i> AI Disease Risk Predictor</h3>
+                <p style="margin-bottom:2rem; font-size:0.9rem;">Enter current vitals to run ML inference for early warnings.</p>
+                
+                <div class="dash-grid" style="gap:1rem;">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Patient Age</label>
+                            <input type="number" id="v-age" class="form-control" value="45">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fasting Blood Sugar (mg/dL)</label>
+                            <input type="number" id="v-glucose" class="form-control" value="110">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Systolic BP (mmHg)</label>
+                            <input type="number" id="v-bp" class="form-control" value="130">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cough Duration (Days)</label>
+                            <input type="number" id="v-cough" class="form-control" value="3">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" onclick="runAI()" style="width: 100%; border-radius: 8px; margin-top:1rem;">Run AI Assessment</button>
+
+                <div id="aiSpinner" class="loading-spinner">
+                    <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i> &nbsp; Running Inference...
+                </div>
+
+                <div id="aiResults" class="result-meters" style="display: none;">
+                    <div class="meter-card">
+                        <i class="fa-solid fa-droplet" style="color:#ef4444; font-size:2rem; margin-bottom:1rem;"></i>
+                        <h4 style="margin-bottom:5px;">Diabetes</h4>
+                        <div id="res-diabetes-score" style="font-size:1.5rem; font-weight:bold; margin-bottom:5px;">-</div>
+                        <span id="res-diabetes-badge" class="badge-status"></span>
+                    </div>
+                    <div class="meter-card">
+                        <i class="fa-solid fa-heart-pulse" style="color:#f59e0b; font-size:2rem; margin-bottom:1rem;"></i>
+                        <h4 style="margin-bottom:5px;">Hypertension</h4>
+                        <div id="res-ht-score" style="font-size:1.5rem; font-weight:bold; margin-bottom:5px;">-</div>
+                        <span id="res-ht-badge" class="badge-status"></span>
+                    </div>
+                    <div class="meter-card">
+                        <i class="fa-solid fa-lungs" style="color:#10b981; font-size:2rem; margin-bottom:1rem;"></i>
+                        <h4 style="margin-bottom:5px;">Tuberculosis</h4>
+                        <div id="res-tb-score" style="font-size:1.5rem; font-weight:bold; margin-bottom:5px;">-</div>
+                        <span id="res-tb-badge" class="badge-status"></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="modal-overlay">
+        <div class="modal fade-in-up">
+            <div style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0;"><i class="fa-solid fa-circle" style="color: #10b981; font-size: 0.6em; margin-right: 5px; vertical-align: middle;"></i> Secure Consult: Dr. Sharma</h3>
+                <span id="callTimer" style="font-weight: bold; color: var(--primary);">00:00</span>
+            </div>
+            <div class="video-container">
+                <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Doctor Video Profile" class="dr-video" />
+                <div class="patient-video" id="patientVideoContainer">
+                    <video id="localVideo" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px; display: none;"></video>
+                    <i class="fa-solid fa-user" id="patientVideoIcon" style="font-size: 2rem; color: #666;"></i>
+                </div>
+            </div>
+            <div class="video-controls">
+                <button class="v-btn mic"><i class="fa-solid fa-microphone"></i></button>
+                <button class="v-btn cam"><i class="fa-solid fa-video"></i></button>
+                <button class="v-btn end" onclick="endCall()"><i class="fa-solid fa-phone-slash"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js');
+            });
+        }
+
+        // Premium Toast Notification
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = 'fa-info-circle';
+            if(type === 'success') icon = 'fa-check-circle';
+            if(type === 'error') icon = 'fa-exclamation-circle';
+
+            let color = 'var(--primary)';
+            if(type === 'success') color = '#10b981';
+            if(type === 'error') color = '#ef4444';
+
+            toast.innerHTML = `<i class="fa-solid ${icon}" style="color: ${color}; font-size: 1.2rem;"></i> <div>${message}</div>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Use Intersection Observer from existing CSS classes
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+            
+            // Fetch Analytics
+            loadAnalytics();
+            loadPatients();
+        });
+
+        let currentViewedPatientId = null;
+
+        async function loadPatients() {
+            try {
+                const res = await fetch('/api/patients');
+                const data = await res.json();
+                
+                if (data.status === 'success') {
+                    const tbody = document.getElementById('patientTableBody');
+                    tbody.innerHTML = '';
+                    data.data.forEach(p => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${p.id}</td>
+                            <td>${p.name}</td>
+                            <td>${p.age}</td>
+                            <td>${p.village}</td>
+                        `;
+                        tr.onclick = () => {
+                            document.getElementById('patientId').value = p.id;
+                            fetchRecord();
+                            window.scrollTo({ top: document.getElementById('patientId').offsetTop - 100, behavior: 'smooth' });
+                        };
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (err) {
+                console.error("Error fetching patients list.", err);
+            }
+        }
+
+        let analyticsChartInstance = null;
+
+        async function loadAnalytics() {
+            try {
+                const res = await fetch('/api/analytics');
+                const result = await res.json();
+                
+                document.getElementById('totalScreenings').innerText = result.total_screened;
+
+                const ctx = document.getElementById('analyticsChart').getContext('2d');
+                
+                if (analyticsChartInstance) {
+                    analyticsChartInstance.destroy();
+                }
+
+                analyticsChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: result.labels,
+                        datasets: [{
+                            data: result.data,
+                            backgroundColor: [
+                                '#ef4444', // Diabetes (Red)
+                                '#f59e0b', // HT (Orange)
+                                '#10b981', // TB (Green)
+                                '#334155'  // Low Risk (Slate)
+                            ],
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: { color: '#1e293b', font: { family: 'Outfit', size: 12, weight: '500' } }
+                            }
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error("Analytics fetch failed", err);
+            }
+        }
+
+        async function fetchRecord() {
+            const pId = document.getElementById('patientId').value;
+            if(!pId) return showToast("Please enter a Patient ID", "error");
+            
+            document.getElementById('healthRecord').style.display = 'none';
+            document.getElementById('recordSpinner').style.display = 'flex';
+
+            try {
+                const res = await fetch(`/api/records/${pId}`);
+                const data = await res.json();
+                
+                setTimeout(() => {
+                    document.getElementById('recordSpinner').style.display = 'none';
+                    if (data.status === 'success') {
+                        document.getElementById('r-name').innerText = data.data.name;
+                        document.getElementById('r-age').innerText = `${data.data.age} yrs, ${data.data.village}`;
+                        document.getElementById('r-bp').innerText = data.data.vitals.bp;
+                        document.getElementById('r-sugar').innerText = data.data.vitals.sugar_fasting;
+                        document.getElementById('r-history').innerText = data.data.history.join(', ');
+                        
+                        document.getElementById('healthRecord').style.display = 'block';
+
+                        // Pre-fill AI form
+                        document.getElementById('v-age').value = data.data.age;
+                        document.getElementById('v-glucose').value = data.data.vitals.sugar_fasting;
+                        document.getElementById('v-bp').value = data.data.vitals.bp.split('/')[0];
+                        
+                        currentViewedPatientId = pId;
+                        showToast("Record fetched successfully", "success");
+
+                    } else {
+                        currentViewedPatientId = null;
+                        showToast("Record not found on network.", "error");
+                    }
+                }, 800); // Simulate network latency
+
+            } catch (err) {
+                showToast("Error connecting to server", "error");
+                document.getElementById('recordSpinner').style.display = 'none';
+            }
+        }
+
+        function editCurrentPatient() {
+            if (!currentViewedPatientId) return;
+            // Pre-fill modal
+            const name = document.getElementById('r-name').innerText;
+            const ageVillage = document.getElementById('r-age').innerText.split(', ');
+            const history = document.getElementById('r-history').innerText;
+
+            document.getElementById('edit-name').value = name;
+            document.getElementById('edit-age').value = parseInt(ageVillage[0]) || '';
+            document.getElementById('edit-village').value = ageVillage[1] || '';
+            document.getElementById('edit-history').value = history;
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        async function savePatientEdit() {
+            if(!currentViewedPatientId) return;
+            const payload = {
+                name: document.getElementById('edit-name').value,
+                age: document.getElementById('edit-age').value,
+                village: document.getElementById('edit-village').value,
+                history: document.getElementById('edit-history').value
+            };
+
+            try {
+                const res = await fetch(`/api/patients/${currentViewedPatientId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if(data.status === 'success') {
+                    showToast("Patient updated successfully", "success");
+                    document.getElementById('editModal').style.display = 'none';
+                    fetchRecord();
+                    loadPatients();
+                } else {
+                    showToast(data.message, "error");
+                }
+            } catch (err) {
+                showToast("Failed to update patient", "error");
+            }
+        }
+
+        async function deleteCurrentPatient() {
+            if(!currentViewedPatientId) return;
+            if(!confirm("Are you sure you want to delete this patient record?")) return;
+
+            try {
+                const res = await fetch(`/api/patients/${currentViewedPatientId}`, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
+                if(data.status === 'success') {
+                    showToast("Patient deleted successfully", "success");
+                    document.getElementById('healthRecord').style.display = 'none';
+                    document.getElementById('patientId').value = '';
+                    currentViewedPatientId = null;
+                    loadPatients();
+                    loadAnalytics();
+                } else {
+                    showToast(data.message, "error");
+                }
+            } catch (err) {
+                showToast("Failed to delete patient", "error");
+            }
+        }
+
+        async function addPatient() {
+            const name = document.getElementById('np-name').value;
+            const age = document.getElementById('np-age').value;
+            const village = document.getElementById('np-village').value;
+            
+            if (!name || !age || !village) {
+                return showToast("Please fill all patient fields", "error");
+            }
+            
+            try {
+                const res = await fetch('/api/patients', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        age: age,
+                        village: village,
+                        last_visit: new Date().toISOString().split('T')[0],
+                        history: "Newly Registered",
+                        vitals: { bp: "120/80", sugar_fasting: 90, temp: 98.6 }
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.status === 'success') {
+                    showToast(`Patient registered! ID: ${data.patient_id}`, "success");
+                    document.getElementById('np-name').value = '';
+                    document.getElementById('np-age').value = '';
+                    document.getElementById('np-village').value = '';
+                    loadPatients();
+                    loadAnalytics();
+                } else {
+                    showToast("Error: " + data.message, "error");
+                }
+            } catch (err) {
+                showToast("Error connecting to server", "error");
+            }
+        }
+
+        async function runAI() {
+            const vitals = {
+                age: document.getElementById('v-age').value,
+                glucose: document.getElementById('v-glucose').value,
+                systolic_bp: document.getElementById('v-bp').value,
+                cough_duration: document.getElementById('v-cough').value
+            };
+
+            document.getElementById('aiResults').style.display = 'none';
+            document.getElementById('aiSpinner').style.display = 'flex';
+
+            try {
+                const res = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(vitals)
+                });
+                const scores = await res.json();
+
+               setTimeout(() => {
+                    document.getElementById('aiSpinner').style.display = 'none';
+                    document.getElementById('aiResults').style.display = 'grid';
+
+                    // Update UI Cards
+                    updateMeter('diabetes', scores.diabetes);
+                    updateMeter('ht', scores.hypertension);
+                    updateMeter('tb', scores.tuberculosis);
+                    
+                    showToast("AI inference completed successfully", "success");
+               }, 1200); // Simulate ML inference time
+
+            } catch (err) {
+                showToast("AI Engine Error", "error");
+                document.getElementById('aiSpinner').style.display = 'none';
+            }
+        }
+
+        function updateMeter(id, data) {
+            document.getElementById(`res-${id}-score`).innerText = `${data.score}% Risk`;
+            const badge = document.getElementById(`res-${id}-badge`);
+            badge.innerText = data.level;
+            
+            badge.className = 'badge-status'; // reset
+            if(data.level === 'High') badge.classList.add('bg-high');
+            else if(data.level === 'Moderate') badge.classList.add('bg-moderate');
+            else badge.classList.add('bg-low');
+        }
+
+        let localStream = null;
+
+        async function startVideoCall() {
+            document.getElementById('videoModal').style.display = 'flex';
+            seconds = 0;
+            document.getElementById('callTimer').innerText = '00:00';
+            callInterval = setInterval(() => {
+                seconds++;
+                const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+                const secs = String(seconds % 60).padStart(2, '0');
+                document.getElementById('callTimer').innerText = `${mins}:${secs}`;
+            }, 1000);
+
+            // Attempt to fetch local camera metadata
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                const videoEl = document.getElementById('localVideo');
+                videoEl.srcObject = localStream;
+                videoEl.style.display = 'block';
+                document.getElementById('patientVideoIcon').style.display = 'none';
+                showToast("Live camera feed linked securely.", "success");
+            } catch (err) {
+                console.error("Camera access failed:", err);
+                showToast("No webcam detected. Using fallback avatar.", "error");
+            }
+        }
+
+        function endCall() {
+            document.getElementById('videoModal').style.display = 'none';
+            clearInterval(callInterval);
+            
+            // Clean up the camera tracks so light turns off
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+                document.getElementById('localVideo').style.display = 'none';
+                document.getElementById('patientVideoIcon').style.display = 'block';
+            }
+            
+            // Wait 500ms before alert for smoother close
+            setTimeout(() => {
+                showToast("Consultation ended. Summary added to record.", "success");
+            }, 500);
+        }
+    </script>
+    
+    <!-- Google Translate Script for Multilingual Support -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'hi,te,ta,bn,kn,ml,mr,gu,pa',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <style>
+        /* Customizing the google translate bar */
+        .goog-te-gadget-simple {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 6px !important;
+            padding: 4px 8px !important;
+            font-family: 'Outfit', sans-serif !important;
+        }
+        .goog-te-gadget-simple span { color: white !important; }
+        .goog-te-menu-value span { color: white !important; }
+        .goog-te-menu-value span:nth-child(5) { color: var(--primary) !important; }
+        .goog-te-menu-value img { display: none; }
+        body { top: 0 !important; }
+        .skiptranslate iframe { display: none !important; }
+    </style>
+
+    <!-- Floating AI Assistant -->
+    <div id="aiChatOpenBtn" style="position: fixed; bottom: 20px; left: 20px; z-index: 1000; width: 60px; height: 60px; background: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(12, 163, 143, 0.4); font-size: 1.5rem; transition: transform 0.3s;" onclick="toggleChat()">
+        <i class="fa-solid fa-robot" style="color: white;"></i>
+    </div>
+
+    <div id="aiChatBox" class="glass-card" style="position: fixed; bottom: 90px; left: 20px; z-index: 1000; width: 350px; height: 450px; display: none; flex-direction: column; padding: 0; overflow: hidden; border: 1px solid var(--primary); background: #0f172a;">
+        <div style="background: rgba(12, 163, 143, 0.2); padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="margin: 0; color: white;"><i class="fa-solid fa-robot" style="color: var(--primary);"></i> MediSync AI Assistant</h4>
+            <i class="fa-solid fa-times" style="cursor: pointer; color: #aaa;" onclick="toggleChat()"></i>
+        </div>
+        <div id="chatMessages" style="flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+            <div style="background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: 8px; font-size: 0.9rem; align-self: flex-start; max-width: 85%;">
+                Hello, Doctor! Need a second opinion on a patient's vitals, or help deciphering a rural health anamnesis? 
+            </div>
+        </div>
+        <div style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px;">
+            <input type="text" id="chatInput" placeholder="Ask AI..." class="form-control" style="padding: 0.5rem; border-radius: 20px;" onkeypress="if(event.key === 'Enter') sendChatMessage()">
+            <button class="btn-primary" style="padding: 0 1rem; border-radius: 50%;" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const chat = document.getElementById('aiChatBox');
+            chat.style.display = chat.style.display === 'none' || chat.style.display === '' ? 'flex' : 'none';
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+            
+            // Add user message
+            chatMessages.innerHTML += `<div style="background: var(--primary); color: white; padding: 0.8rem; border-radius: 8px; font-size: 0.9rem; align-self: flex-end; max-width: 85%;">${msg}</div>`;
+            input.value = '';
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg })
+                });
+                const data = await res.json();
+                
+                setTimeout(() => {
+                    chatMessages.innerHTML += `<div style="background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: 8px; font-size: 0.9rem; align-self: flex-start; max-width: 85%; border-left: 2px solid var(--primary);"><i class="fa-solid fa-robot" style="color: var(--primary); margin-right: 5px;"></i> ${data.reply}</div>`;
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 400); // Small wait for aesthetic AI typing simulation
+            } catch (err) {
+                console.error("Chat error", err);
+            }
+        }
+    </script>
+</body>
+</html>

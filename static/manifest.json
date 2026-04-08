@@ -1,0 +1,16 @@
+{
+  "name": "MediSync Rural Healthcare",
+  "short_name": "MediSync",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#f0fdfa",
+  "theme_color": "#0d9488",
+  "description": "AI-Powered Rural Health Platform",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3063/3063206.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

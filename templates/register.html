@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Registration - MediSync</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background: radial-gradient(circle at top left, #0f172a, #020617);
+        }
+        .login-box {
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 3rem; border-radius: 16px;
+            width: 100%; max-width: 450px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative; overflow: hidden;
+        }
+        .login-box::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-20deg); animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            100% { left: 200%; }
+        }
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        .form-label { display: block; margin-bottom: 0.5rem; color: #cbd5e1; font-weight: 500; }
+        .form-control {
+            width: 100%; padding: 1rem; border-radius: 8px;
+            background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
+            color: white; font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); background: rgba(0,0,0,0.3); }
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2); color: #fca5a5;
+            padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;
+            border-left: 4px solid #ef4444; font-size: 0.9rem;
+        }
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2); color: #6ee7b7;
+            padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;
+            border-left: 4px solid #10b981; font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <h2 style="margin-bottom: 0.5rem;">Register Staff</h2>
+        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 2rem;">Create a new MediSync account based off secure protocols.</p>
+
+        {% if error %}
+        <div class="alert-error">
+            <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+        </div>
+        {% endif %}
+        
+        {% if success %}
+        <div class="alert-success">
+            <i class="fa-solid fa-check-circle"></i> {{ success }}
+        </div>
+        {% endif %}
+
+        <form action="/register" method="POST">
+            <div class="form-group">
+                <label class="form-label">Practitioner ID (Username)</label>
+                <div style="position: relative;">
+                    <i class="fa-solid fa-user" style="position: absolute; left: 1rem; top: 1.1rem; color: #64748b;"></i>
+                    <input type="text" name="username" class="form-control" style="padding-left: 2.8rem;" required placeholder="e.g. drsharma_99">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Secure Password</label>
+                <div style="position: relative;">
+                    <i class="fa-solid fa-lock" style="position: absolute; left: 1rem; top: 1.1rem; color: #64748b;"></i>
+                    <input type="password" name="password" class="form-control" style="padding-left: 2.8rem;" required placeholder="••••••••">
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%; border-radius: 8px; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;">
+                Register Account <i class="fa-solid fa-clipboard-check ml-2" style="margin-left: 5px;"></i>
+            </button>
+        </form>
+        
+        <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; display: flex; justify-content: space-between;">
+            <a href="/login" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; transition: color 0.3s;"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+            <a href="/" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;"><i class="fa-solid fa-home"></i> Public Portal</a>
+        </div>
+    </div>
+</body>
+</html>

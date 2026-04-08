@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediSync - AI-Powered Rural Health Platform</title>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#0d9488">
+    <meta name="description" content="MediSync bridges India's urban-rural healthcare divide with Unified Digital Health Records, AI Disease Risk Predictor, and Telemedicine.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-heart-pulse"></i> MediSync
+            </div>
+            <ul class="nav-links">
+                <li><a href="#problem">Problem</a></li>
+                <li><a href="#solution">Solution</a></li>
+                <li><a href="#impact">Impact</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#tech-stack">Tech Stack</a></li>
+            </ul>
+            <a href="/login" class="btn-primary-sm"><i class="fa-solid fa-user-doctor"></i> Staff Login</a>
+            <div class="menu-toggle">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="hero" class="hero">
+        <div class="hero-content fade-in-up">
+            <div class="badge">HackXplore 2K26</div>
+            <h1 class="hero-title">Bridging the Healthcare Divide with AI</h1>
+            <p class="hero-subtitle">An intelligent, multilingual rural health platform bringing specialized care to every village.</p>
+            <div class="hero-buttons">
+                <a href="/login" class="btn-primary">Login to Platform</a>
+                <a href="#how-it-works" class="btn-secondary">How it Works</a>
+            </div>
+        </div>
+        <div class="hero-background">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+        </div>
+    </header>
+
+    <!-- Problem Section -->
+    <section id="problem" class="section">
+        <div class="container">
+            <h2 class="section-title fade-in-up">The Reality of Rural Healthcare</h2>
+            <div class="grid-3 problem-stats">
+                <div class="glass-card stat-card fade-in-up" style="animation-delay: 0.1s">
+                    <div class="stat-icon"><i class="fa-solid fa-user-doctor"></i></div>
+                    <h3>74%</h3>
+                    <p>Of rural India lacks access to specialist doctors.</p>
+                </div>
+                <div class="glass-card stat-card fade-in-up" style="animation-delay: 0.2s">
+                    <div class="stat-icon"><i class="fa-solid fa-file-medical"></i></div>
+                    <h3>700M+</h3>
+                    <p>People affected by unsafe health document sharing.</p>
+                </div>
+                <div class="glass-card stat-card fade-in-up" style="animation-delay: 0.3s">
+                    <div class="stat-icon"><i class="fa-solid fa-language"></i></div>
+                    <h3>8+</h3>
+                    <p>Regional languages required to break the language barrier.</p>
+                </div>
+                <div class="glass-card stat-card fade-in-up" style="animation-delay: 0.4s">
+                    <div class="stat-icon"><i class="fa-solid fa-road"></i></div>
+                    <h3>50-100 km</h3>
+                    <p>Distance traveled for basic medical consultations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section id="solution" class="section alt-bg">
+        <div class="container">
+            <h2 class="section-title fade-in-up">The MediSync Solution</h2>
+            <p class="section-desc fade-in-up">Three core technologies working together seamlessly to democratize healthcare.</p>
+            
+            <div class="features-wrapper">
+                <div class="feature-row fade-in-up">
+                    <div class="feature-text">
+                        <div class="feature-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                        <h3>Unified Digital Health Records</h3>
+                        <p>Lifelong, portable, and low-bandwidth compliant records. Access patient histories seamlessly across clinics and hospitals without relying on fragile physical files. Fully ABDM-aligned for Ayushman Bharat integration.</p>
+                    </div>
+                    <div class="feature-image glass-card" style="padding: 0; overflow: hidden;">
+                        <div class="mockup-header">Patient Profile</div>
+                        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Digital Health Profile Interface" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+
+                <div class="feature-row reverse fade-in-up">
+                    <div class="feature-text">
+                        <div class="feature-icon"><i class="fa-solid fa-brain"></i></div>
+                        <h3>AI Disease Risk Predictor</h3>
+                        <p>Machine Learning-based early warning system for chronic conditions like Diabetes, TB, and Hypertension. Alerts doctors to high-risk patients up to 40% faster, improving outcomes and reducing mortality.</p>
+                    </div>
+                    <div class="feature-image glass-card">
+                        <div class="mockup-header ai-header">AI Analysis Complete</div>
+                        <div class="mockup-content center-flex">
+                            <div class="risk-meter">
+                                <svg viewBox="0 0 36 36" class="circular-chart orange">
+                                    <path class="circle-bg"
+                                      d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                    <path class="circle"
+                                      stroke-dasharray="75, 100"
+                                      d="M18 2.0845
+                                        a 15.9155 15.9155 0 0 1 0 31.831
+                                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                    <text x="18" y="20.35" class="percentage">75%</text>
+                                  </svg>
+                                  <div class="risk-label">TB Risk Factor</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-row fade-in-up">
+                    <div class="feature-text">
+                        <div class="feature-icon"><i class="fa-solid fa-video"></i></div>
+                        <h3>Telemedicine Connect</h3>
+                        <p>One-tap video consultations connecting remote clinics with the nearest available specialist. Eliminates unnecessary travel. Features real-time translation and auto-generated post-consultation summaries.</p>
+                    </div>
+                    <div class="feature-image glass-card" style="padding: 0; overflow: hidden; background: #1e293b;">
+                        <div class="mockup-header">Dr. Sharma is calling...</div>
+                        <div style="position: relative; width: 100%; height: 100%;">
+                            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Doctor Video Call Telemedicine" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
+                            <div class="call-controls" style="position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 20px;">
+                                <div class="call-btn red" style="box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);"><i class="fa-solid fa-phone-slash"></i></div>
+                                <div class="call-btn green" style="box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);"><i class="fa-solid fa-phone"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works -->
+    <section id="how-it-works" class="section">
+        <div class="container">
+            <h2 class="section-title fade-in-up">How It Works</h2>
+            <div class="timeline">
+                <div class="timeline-item fade-in-up">
+                    <div class="timeline-dot">1</div>
+                    <div class="glass-card timeline-content">
+                        <h3>Patient Registration</h3>
+                        <p>Villagers register at a local rural health center or via ASHA workers on low-end smartphones. Profile is generated using available IDs.</p>
+                    </div>
+                </div>
+                <div class="timeline-item fade-in-up">
+                    <div class="timeline-dot">2</div>
+                    <div class="glass-card timeline-content">
+                        <h3>Vitals & Symptoms Logging</h3>
+                        <p>Basic vitals and symptoms are entered in the local regional language. AI engine translates and processes the initial input.</p>
+                    </div>
+                </div>
+                <div class="timeline-item fade-in-up">
+                    <div class="timeline-dot">3</div>
+                    <div class="glass-card timeline-content">
+                        <h3>AI Risk Assessment</h3>
+                        <p>The system evaluates the data for early markers of Diabetes, TB, or Hypertension, auto-flagging critical cases to priority queues.</p>
+                    </div>
+                </div>
+                <div class="timeline-item fade-in-up">
+                    <div class="timeline-dot">4</div>
+                    <div class="glass-card timeline-content">
+                        <h3>Teleconsultation & e-Prescription</h3>
+                        <p>If required, a seamless low-bandwidth video call is initiated. Doctor provides diagnosis and an automated e-prescription is sent.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact & Pros/Cons -->
+    <section id="impact" class="section alt-bg">
+        <div class="container">
+            <h2 class="section-title fade-in-up">Impact & Viability</h2>
+            <p class="section-desc fade-in-up">Aligned with UN SDGs 3 (Good Health), 10 (Reduced Inequalities), and 17 (Partnerships).</p>
+            
+            <div class="grid-2 pros-cons">
+                <div class="glass-card pros fade-in-up">
+                    <h3><i class="fa-solid fa-check-circle" style="color: #4ade80;"></i> Advantages</h3>
+                    <ul class="custom-list">
+                        <li><strong>40% faster detection</strong> via AI early alerts.</li>
+                        <li><strong>Genuinely usable on 2G/3G</strong> via PWA architecture.</li>
+                        <li><strong>Free tier</strong> removes financial barriers for the poorest.</li>
+                        <li><strong>ABDM-aligned</strong> to plug into Ayushman Bharat schemes.</li>
+                        <li><strong>Eliminates travel</strong> for basic to intermediate consultations.</li>
+                        <li><strong>Auto-generated summaries</strong> for better follow-up care.</li>
+                    </ul>
+                </div>
+                <div class="glass-card cons fade-in-up" style="animation-delay: 0.2s">
+                    <h3><i class="fa-solid fa-triangle-exclamation" style="color: #fca5a5;"></i> Challenges to Overcome</h3>
+                    <ul class="custom-list problem-list">
+                        <li><strong>Digital literacy</strong> in rural areas makes self-onboarding hard.</li>
+                        <li><strong>ML accuracy</strong> heavily depends on scarce rural training data.</li>
+                        <li><strong>Supply constraint:</strong> Requires a large willing doctor workforce.</li>
+                        <li><strong>Regulatory compliance</strong> with NMC telemedicine guidelines.</li>
+                        <li><strong>Trust issues</strong> regarding digital health data storage.</li>
+                        <li><strong>Hardware access</strong> limitations for high-quality video calls.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section id="tech-stack" class="section">
+        <div class="container">
+            <h2 class="section-title fade-in-up">Technology Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-card glass-card fade-in-up" style="animation-delay: 0.1s">
+                    <div class="tech-icon"><i class="fa-brands fa-react tech-color-react"></i></div>
+                    <h3>Frontend</h3>
+                    <p>React.js + Tailwind CSS</p>
+                    <span class="tech-badge">PWA Ready</span>
+                </div>
+                <div class="tech-card glass-card fade-in-up" style="animation-delay: 0.2s">
+                    <div class="tech-icon"><i class="fa-brands fa-node-js tech-color-node"></i></div>
+                    <h3>Backend</h3>
+                    <p>Node.js + Express.js</p>
+                    <span class="tech-badge">REST API</span>
+                </div>
+                <div class="tech-card glass-card fade-in-up" style="animation-delay: 0.3s">
+                    <div class="tech-icon"><i class="fa-brands fa-python tech-color-python"></i></div>
+                    <h3>ML Engine</h3>
+                    <p>Python Flask + scikit-learn</p>
+                    <span class="tech-badge">Predictive AI</span>
+                </div>
+                <div class="tech-card glass-card fade-in-up" style="animation-delay: 0.4s">
+                    <div class="tech-icon"><i class="fa-solid fa-database tech-color-db"></i></div>
+                    <h3>Database</h3>
+                    <p>MongoDB Atlas</p>
+                    <span class="tech-badge">NoSQL</span>
+                </div>
+                <div class="tech-card glass-card fade-in-up" style="animation-delay: 0.5s">
+                    <div class="tech-icon"><i class="fa-solid fa-network-wired tech-color-api"></i></div>
+                    <h3>Integrations</h3>
+                    <p>WebRTC, Google Translate, Chart.js</p>
+                    <span class="tech-badge">Third Party</span>
+                </div>
+                <div class="tech-card glass-card fade-in-up" style="animation-delay: 0.6s">
+                    <div class="tech-icon"><i class="fa-solid fa-shield-halved tech-color-sec"></i></div>
+                    <h3>Security</h3>
+                    <p>JWT + bcrypt</p>
+                    <span class="tech-badge">Authentication</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vision Section -->
+    <section id="vision" class="section vision-section alt-bg">
+        <div class="container text-center">
+            <div class="glass-card vision-card fade-in-up">
+                <i class="fa-solid fa-eye vision-icon"></i>
+                <h2>Our Vision</h2>
+                <p>To create an India where specialized healthcare is a fundamental right, not a geographic privilege. MediSync aims to serve the 74% of rural citizens currently operating outside the modern healthcare grid, bringing the doctor directly to their doorstep.</p>
+                <button class="btn-primary mt-4" onclick="window.scrollTo(0, 0)">Back to Top</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fa-solid fa-heart-pulse"></i> MediSync
+                </div>
+                <p>Designed for HackXplore 2K26</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-github"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-solid fa-envelope"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2026 MediSync Team. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js');
+            });
+        }
+    </script>
+</body>
+</html>
