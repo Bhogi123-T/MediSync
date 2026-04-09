@@ -52,8 +52,8 @@
         <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">
             <i class="fa-solid fa-heart-pulse"></i>
         </div>
-        <h2 style="margin-bottom: 0.5rem;">Welcome to MediSync</h2>
-        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 2rem;">Authorized Healthcare Personnel Only</p>
+        <h2 style="margin-bottom: 0.5rem; color: white;">Welcome to MediSync</h2>
+        <p id="role-subtitle" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 2rem;">Select your role to continue</p>
 
         {% if error %}
         <div class="alert-error">
@@ -63,10 +63,21 @@
 
         <form action="/login" method="POST">
             <div class="form-group">
-                <label class="form-label">Practitioner ID</label>
+                <label class="form-label">User ID (Username)</label>
                 <div style="position: relative;">
                     <i class="fa-solid fa-user" style="position: absolute; left: 1rem; top: 1.1rem; color: #64748b;"></i>
-                    <input type="text" name="username" class="form-control" style="padding-left: 2.8rem;" required placeholder="e.g. doctor">
+                    <input type="text" name="username" class="form-control" style="padding-left: 2.8rem;" required placeholder="e.g. user123">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Account Role</label>
+                <div style="position: relative;">
+                    <i class="fa-solid fa-id-badge" style="position: absolute; left: 1rem; top: 1.1rem; color: #64748b;"></i>
+                    <select name="role" class="form-control" style="padding-left: 2.8rem; appearance: none; -webkit-appearance: none;">
+                        <option value="patient">Patient (People)</option>
+                        <option value="staff">Staff / Health Worker</option>
+                        <option value="doctor">Specialist Doctor</option>
+                    </select>
                 </div>
             </div>
             <div class="form-group">
@@ -77,14 +88,29 @@
                 </div>
             </div>
             <button type="submit" class="btn-primary" style="width: 100%; border-radius: 8px; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;">
-                Authenticate <i class="fa-solid fa-arrow-right-to-bracket ml-2" style="margin-left: 5px;"></i>
+                Login <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left: 5px;"></i>
             </button>
         </form>
         
         <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; display: flex; justify-content: space-between;">
-            <a href="/register" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; transition: color 0.3s;"><i class="fa-solid fa-user-plus"></i> Register Staff</a>
+            <a href="/register" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; transition: color 0.3s;"><i class="fa-solid fa-user-plus"></i> Register Account</a>
             <a href="/" style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;"><i class="fa-solid fa-home"></i> Public Portal</a>
         </div>
     </div>
+    <script>
+        const subtitles = {
+            patient: 'Login to view your health records & book teleconsultations.',
+            staff: 'Login to manage patient registrations & village health data.',
+            doctor: 'Login to view patient AI risk reports & start video consultations.'
+        };
+        const roleSelect = document.querySelector('select[name="role"]');
+        const subtitle = document.getElementById('role-subtitle');
+        if (roleSelect) {
+            roleSelect.addEventListener('change', () => {
+                subtitle.textContent = subtitles[roleSelect.value] || 'Select your role to continue';
+            });
+            subtitle.textContent = subtitles[roleSelect.value];
+        }
+    </script>
 </body>
 </html>

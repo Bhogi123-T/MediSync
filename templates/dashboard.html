@@ -21,6 +21,13 @@
             </div>
             <div style="display: flex; gap: 1rem; align-items: center;">
                 <div id="google_translate_element"></div>
+                <!-- Role chip -->
+                <div style="display:flex; align-items:center; gap:0.5rem; background:rgba(13,148,136,0.1); border:1px solid rgba(13,148,136,0.3); border-radius:50px; padding:0.35rem 0.9rem; font-size:0.85rem; font-weight:600; color:var(--primary);">
+                    {% if role == 'doctor' %}<i class="fa-solid fa-user-doctor"></i>
+                    {% elif role == 'staff' %}<i class="fa-solid fa-briefcase-medical"></i>
+                    {% else %}<i class="fa-solid fa-user"></i>{% endif %}
+                    {{ username }} &middot; {{ role | title }}
+                </div>
                 <a href="/logout" class="btn-secondary" style="padding: 0.5rem 1.2rem;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>
         </div>
@@ -30,12 +37,13 @@
         <div class="dash-header fade-in-up">
             <div>
                 <h2>Rural Healthcare Dashboard</h2>
-                <p>Welcome, Doctor / Health Worker. Manage patient records and run AI assessments.</p>
+                <p>Welcome, <strong>{{ username }}</strong> ({{ role | title }}).{% if role != 'patient' %} Manage patient records and run AI assessments.{% else %} View your health records and access telemedicine.{% endif %}</p>
             </div>
             <div class="badge">MVP Demonstration v1.0</div>
         </div>
 
         <div class="dash-grid">
+            {% if role != 'patient' %}
             <!-- Add New Patient -->
             <div class="glass-card panel fade-in-up">
                 <h3><i class="fa-solid fa-user-plus"></i> Register New Patient</h3>
@@ -77,6 +85,7 @@
                     </table>
                 </div>
             </div>
+            {% endif %}
 
             <!-- Unified PR -->
             <div class="glass-card panel fade-in-up">
@@ -100,10 +109,12 @@
                     <div class="record-item"><span>Last BP:</span> <b id="r-bp"></b></div>
                     <div class="record-item"><span>Last Fasting Sugar:</span> <b id="r-sugar"></b> mg/dL</div>
                     <div class="record-item"><span>Medical History:</span> <b id="r-history"></b></div>
+                    {% if role != 'patient' %}
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
                         <button class="btn-edit" onclick="editCurrentPatient()"><i class="fa-solid fa-edit"></i> Edit</button>
                         <button class="btn-danger" onclick="deleteCurrentPatient()"><i class="fa-solid fa-trash"></i> Delete</button>
                     </div>
+                    {% endif %}
                 </div>
             </div>
 

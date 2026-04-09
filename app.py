@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 import os
+from ml_engine import global_disease_predictor, global_chatbot
 
 app = Flask(__name__)
 app.secret_key = 'medisync_hackathon_super_secret_key'
@@ -18,6 +19,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(50), nullable=False, default='patient')
 
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,12 +74,13 @@ def register():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
+        role = request.form.get("role", "patient")
         
         if User.query.filter_by(username=username).first():
-            return render_template("register.html", error="Practitioner ID already exists.")
+            return render_template("register.html", error="User ID already exists.")
             
         hashed_pw = generate_password_hash(password)
-        new_user = User(username=username, password_hash=hashed_pw)
+        new_user = User(username=username, password_hash=hashed_pw, role=role)
         db.session.add(new_user)
         db.session.commit()
         return render_template("register.html", success="Account created successfully! You can now login.")
@@ -89,13 +92,17 @@ def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
+        role_attempt = request.form.get("role")
         
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password_hash, password):
+            if user.role != role_attempt:
+                return render_template("login.html", error=f"Account exists, but role mismatch. Registered as {user.role.title()}.")
             session["user"] = username
+            session["role"] = user.role
             return redirect(url_for("dashboard"))
         else:
-            return render_template("login.html", error="Invalid Practitioners ID or Secure Password")
+            return render_template("login.html", error="Invalid User ID or Secure Password")
     return render_template("login.html")
 
 @app.route("/logout")
@@ -107,12 +114,12 @@ def logout():
 def dashboard():
     if "user" not in session:
         return redirect(url_for("login"))
-    return render_template("dashboard.html")
+    return render_template("dashboard.html", username=session["user"], role=session.get("role", "staff"))
 
 @app.route("/api/predict", methods=["POST"])
 def predict_disease():
     """
-    Simulated ML Endpoint for Disease Risk Prediction.
+    Real ML Endpoint for Disease Risk Prediction using RandomForestClassifier.
     """
     data = request.json
     
@@ -121,37 +128,7 @@ def predict_disease():
     systolic_bp = int(data.get("systolic_bp", 120))
     cough_duration_days = int(data.get("cough_duration", 0))
 
-    # Diabetes Risk
-    diabetes_risk = "Low"
-    if glucose > 140:
-        diabetes_risk = "High"
-    elif glucose > 100:
-        diabetes_risk = "Moderate"
-
-    # Hypertension Risk
-    ht_risk = "Low"
-    if systolic_bp > 140:
-        ht_risk = "High"
-    elif systolic_bp > 130:
-        ht_risk = "Moderate"
-
-    # TB Risk
-    tb_risk = "Low"
-    if cough_duration_days > 14:
-         tb_risk = "High"
-    elif cough_duration_days > 7:
-         tb_risk = "Moderate"
-
-    def get_score(level):
-        if level == "High": return random.randint(75, 95)
-        if level == "Moderate": return random.randint(40, 70)
-        return random.randint(5, 30)
-
-    response = {
-        "diabetes": {"level": diabetes_risk, "score": get_score(diabetes_risk)},
-        "hypertension": {"level": ht_risk, "score": get_score(ht_risk)},
-        "tuberculosis": {"level": tb_risk, "score": get_score(tb_risk)}
-    }
+    response = global_disease_predictor.predict(age, glucose, systolic_bp, cough_duration_days)
 
     return jsonify(response)
 
@@ -317,20 +294,12 @@ def get_analytics():
 @app.route("/api/chat", methods=["POST"])
 def chat_assistant():
     """
-    AI Assistant routing Endpoint
+    AI Assistant routing Endpoint using TfidfVectorizer NLP Matching
     """
     data = request.json
-    msg = data.get("message", "").lower()
+    msg = data.get("message", "")
     
-    response = "I am processing the data across national medical protocols..."
-    if 'diabetes' in msg or 'sugar' in msg:
-        response = "Given a fasting sugar > 120, suggest a strict HbA1c test and immediate dietary restrictions for village-level care."
-    elif 'bp' in msg or 'hypertension' in msg:
-        response = "A Blood Pressure reading over 135/85 requires Phase-1 monitoring. Setup Telmisartan protocol if confirmed twice."
-    elif 'tuberculosis' in msg or 'cough' in msg:
-        response = "Sputum test mandatory for coughs extending past 14 days. Isolate the patient temporarily if available."
-    else:
-        response = "Based on standard ABDM guidelines for rural healthcare, I recommend connecting with a specialized practitioner via the Telemedicine panel."
+    response = global_chatbot.get_response(msg)
         
     return jsonify({"status": "success", "reply": response})
 

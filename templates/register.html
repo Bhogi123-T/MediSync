@@ -74,10 +74,21 @@
 
         <form action="/register" method="POST">
             <div class="form-group">
-                <label class="form-label">Practitioner ID (Username)</label>
+                <label class="form-label">User ID (Username)</label>
                 <div style="position: relative;">
                     <i class="fa-solid fa-user" style="position: absolute; left: 1rem; top: 1.1rem; color: #64748b;"></i>
-                    <input type="text" name="username" class="form-control" style="padding-left: 2.8rem;" required placeholder="e.g. drsharma_99">
+                    <input type="text" name="username" class="form-control" style="padding-left: 2.8rem;" required placeholder="e.g. user123">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Designated Role</label>
+                <div style="position: relative;">
+                    <i class="fa-solid fa-id-badge" style="position: absolute; left: 1rem; top: 1.1rem; color: #64748b;"></i>
+                    <select name="role" class="form-control" style="padding-left: 2.8rem; appearance: none; -webkit-appearance: none;">
+                        <option value="patient">Patient (People)</option>
+                        <option value="staff">Staff / Health Worker</option>
+                        <option value="doctor">Specialist Doctor</option>
+                    </select>
                 </div>
             </div>
             <div class="form-group">
